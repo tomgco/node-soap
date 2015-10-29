@@ -40,7 +40,56 @@ describe('ClientSSLSecurityPFX', function() {
     }
   });
 
-  it('should accept a Buffer as argument for the key or cert', function () {
+  it('should be able to make a request', function (done) {
+    var https = require('https');
+    var pfkBuffer = fs.readFileSync(join(__dirname, '..', 'certs', 'client-password.pfx')),
+      instance;
+
+    instance = new ClientSSLSecurityPFX(pfkBuffer, 'test2test');
+    var soptions = {
+      host: 'localhost',
+      port: 1338,
+      requestCert: true,
+      rejectUnauthorized: false,
+      pfx: fs.readFileSync(join(__dirname, '..', 'certs', 'server-password.pfx')),
+      passphrase: 'test2test',
+    };
+    var options = {
+      port: 1338
+    };
+    instance.addOptions(options);
+
+    var server = https.createServer(soptions, function(req, res) {
+      req.socket.should.have.property('authorized', true);
+      req.socket.should.have.property('authorizationError', null);
+      res.writeHead(200);
+      res.end('OK');
+    });
+
+    server.listen(soptions.port, soptions.host, function() {
+      var data = '';
+
+      https.get(options, function(res) {
+        res.on('data', function(data_) { data += data_; });
+        res.on('end', function() {
+          server.close();
+          data.should.equal('OK');
+          done();
+        });
+      });
+    });
+  });
+
+  it('should accept a passphrase as argument for the pfx cert', function () {
+    var pfkBuffer = fs.readFileSync(join(__dirname, '..', 'certs', 'client-password.pfx')),
+      instance;
+
+    instance = new ClientSSLSecurityPFX(pfkBuffer, 'test2est');
+    instance.should.have.property("pfx", pfkBuffer);
+    instance.should.have.property("passphrase", 'test2est');
+  });
+
+  it('should accept a Buffer as argument for the pfx cert', function () {
     var pfkBuffer = fs.readFileSync(join(__dirname, '..', 'certs', 'pfk-buffer.pfx')),
       instance;
 
