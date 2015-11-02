@@ -7,16 +7,16 @@ describe('ClientSSLSecurityPFX', function() {
   var ClientSSLSecurityPFX = require('../../').ClientSSLSecurityPFX;
   var pfx = __filename;
 
-  it('is a function', function() {
+  it('should be function', function() {
     ClientSSLSecurityPFX.should.be.type('function');
   });
 
   describe('defaultOption param', function() {
-    it('is accepted as the second param', function() {
+    it('should be accepted as the second param', function() {
       new ClientSSLSecurityPFX(null, {});
     });
 
-    it('is used in addOptions', function() {
+    it('should be used in addOptions', function() {
       var options = {};
       var defaultOptions = { foo: 5 };
       var instance = new ClientSSLSecurityPFX(null, defaultOptions);
@@ -40,7 +40,7 @@ describe('ClientSSLSecurityPFX', function() {
     }
   });
 
-  it('should be able to make a request', function (done) {
+  it('should be usable in a request', function (done) {
     var https = require('https');
     var pfkBuffer = fs.readFileSync(join(__dirname, '..', 'certs', 'client-password.pfx')),
       instance;
